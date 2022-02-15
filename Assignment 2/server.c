@@ -4,6 +4,8 @@
 #include<arpa/inet.h>	//inet_addr
 #include<unistd.h>	//write
 
+#define PORT 9000
+
 int main(int argc, char *argv[]){
 
     int socket_TCP, socket_UDP, client_TCP, client_UDP; 
@@ -12,14 +14,14 @@ int main(int argc, char *argv[]){
 
     // create TCP 
     socket_TCP = socket(AF_INET, SOCK_STREAM, 0);
-    if (socket_desc == -1)
+    if (socket_TCP == -1)
 	{
 		printf("Could not create socket\n");
 	}
 
     server_TCP.sin_family = AF_INET;
 	server_TCP.sin_addr.s_addr = INADDR_ANY;
-	server_TCP.sin_port = htons(9000);
+	server_TCP.sin_port = htons(PORT);
 
     int bindStatus = bind(socket_TCP, (struct sockaddr *)&server_TCP, sizeof(server_TCP));
 	if( bindStatus == -1){
@@ -33,8 +35,26 @@ int main(int argc, char *argv[]){
     puts("TCP Socket is running now... \n");
 
     // crate UDP 
+    socket_UDP = socket(AF_INET, SOCK_DTREAM, 0);
+    if (socket_UDP == -1)
+	{
+		printf("Could not create socket\n");
+	}
 
-	//~~
+    server_UDP.sin_family = AF_INET;
+	server_UDP.sin_addr.s_addr = INADDR_ANY;
+	server_UDP.sin_port = htons(PORT);
+
+    int bindStatus = bind(socket_UDP, (struct sockaddr *)&server_UDP, sizeof(server_UDP));
+	if( bindStatus == -1){
+		//print the error message
+		perror("Binding failed");
+		return 1;
+	}
+
+    listen(socket_UDP, 3);
+
+    puts("UDP Socket is running now... \n");
 
     client_TCP = accept(socket_TCP, NULL, NULL);
     client_UDP = accept(socket_UDP, NULL, NULL);
