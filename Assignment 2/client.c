@@ -77,7 +77,7 @@ int main(int argc , char *argv[])
 		if (selection[0] == '1') {
 			printf("You selected 1");
 			printf("Enter your message to devowel: ");
-			scanf("%s", message);
+			scanf("%[^\n]s", message);
 
 			// send message
 			if( send(sock_TCP , message , strlen(message) , 0) < 0)
@@ -100,18 +100,20 @@ int main(int argc , char *argv[])
 
 			printf("Server sent %zu bytes of non-vowels on TCP: ", strlen(server_reply_TCP));
 			puts(server_reply_TCP);
+
 			printf("Server sent %zu bytes of vowels on UDP: ", strlen(server_reply_UDP));
 			puts(server_reply_UDP);
-		} 
-
-		if (selection[0] == '2') {
+			
+		} if (selection[0] == '2') {
 			puts("You selected 2\n");
-
 			// send message
-		}
-		if (selection[0] == '3') {
+		} if (selection[0] == '3') {
 			puts("Program exit\n");
 			break;
+		} else {
+			puts("you have to make a selection in 1, 2, 3\n"); 
+			puts("Program exit\n");
+			break; 
 		}
 
 		// printf("Enter message : ");

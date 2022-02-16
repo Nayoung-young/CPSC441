@@ -9,6 +9,21 @@
 #define PORT_TCP 9000
 #define PORT_UDP 8888
 
+int vowel_check(char c) {
+    if (c == 'a'|| c =='A') 
+        return 1;
+    if (c == 'e'|| c =='E') 
+        return 1;
+    if (c == 'i'|| c =='I') 
+        return 1;
+    if (c == 'o'|| c =='O') 
+        return 1;
+    if (c == 'u'|| c =='U') 
+        return 1;
+    else 
+        return 0;
+}
+
 int main(int argc, char *argv[]){
 
     printf("=============================\n");
@@ -77,21 +92,58 @@ int main(int argc, char *argv[]){
 
     //Receive a message from client
     int recvStatus;
+    char client_selection[2];
+
 	while(1){
-        recvStatus = recv(client_TCP, client_message, 5000, 0);
+        recvStatus = recv(client_TCP, client_selection, 5000, 0);
         if (recvStatus==-1){
             printf("Error in receiving!");
             break;
         }
+        printf("Client selected: %s\n", client_selection);
 
-        printf("Client selected: %s\n", client_message);
-		
-        char serverMsg[5000];
-        strcat(serverMsg,"Hello FROM NAYOUNG");
-        // strcat(serverMsg, client_message);
-		write(client_TCP , serverMsg , strlen(serverMsg)); // send msg to client
-		write(client_UDP , serverMsg , strlen(serverMsg));
-        // write something to your brower 
+        if (client_selection[0] == '1') {
+            // devowel 
+            recvStatus = recv(client_TCP, client_message, 5000, 0);
+            if (recvStatus==-1) {
+                printf("Error in receiving!");
+                break;
+            }
+            printf("String to Devowel: %s\n", client_message);
+
+            char vowel_TCP[1000], nonvowel_UDP[1000];
+            char ch = client_message[0]; 
+            int i = 0; 
+            char blank[5] = " ";
+
+            while (i < (int)strlen(client_message)) {
+                // if vowel 
+                if (vowel_check(ch)){
+                    strncat(vowel_TCP, &ch, 1);
+                    strcat(nonvowel_UDP, blank);
+                }
+                // if non-vowel 
+                else {
+                    strncat(nonvowel_UDP, &ch, 1);
+                    strcat(vowel_TCP, blank);
+                }
+                ch = client_message[++i];
+            }
+            write(client_TCP, vowel_TCP, strlen(vowel_TCP));
+            write(client_UDP, nonvowel_UDP, strlen(nonvowel_UDP));
+        }
+        else if (client_selection[1] == '2'){
+            printf("~~\n");
+        } else {
+            break;
+        }
+
+        // char serverMsg[5000];
+        // strcat(serverMsg,"Hello FROM NAYOUNG");
+        // // strcat(serverMsg, client_message);
+		// write(client_TCP , serverMsg , strlen(serverMsg)); // send msg to client
+		// write(client_UDP , serverMsg , strlen(serverMsg));
+        // // write something to your brower 
 		
 	}
 
