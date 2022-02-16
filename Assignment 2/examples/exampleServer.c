@@ -6,7 +6,6 @@
 
 int main(int argc, char *argv[]){
 
-	// 변수 정의 
 	int socket_desc, client_sock;
 	struct sockaddr_in server, client;
 	char client_message[5000];
@@ -51,6 +50,8 @@ int main(int argc, char *argv[]){
 	
 	//Receive a message from client
     int recvStatus;
+	int count; 
+	count = 0;
 	while(1){
         recvStatus = recv(client_sock, client_message, 5000, 0);
         if (recvStatus==-1){
@@ -58,19 +59,18 @@ int main(int argc, char *argv[]){
             break;
         }
 
+		count ++; 
+		printf("Count is: %i\n", count);
+		// 이 loop 안에서 계속 메시지 recv 
         printf("Client says: %s\n", client_message);
 		char serverMsg[5000];
-        strcat(serverMsg,"Hello FROM NAYOUNG");
-        // strcat(serverMsg, client_message);
-		write(client_sock , serverMsg , strlen(serverMsg)); // send msg to client
-		// write something to your brower 
-		
+        strcat(serverMsg,"Hi Client, this is your msg: ");
+        strcat(serverMsg, client_message);
+		write(client_sock , serverMsg , strlen(serverMsg));
 	}
-	
 
     close(client_sock);
     close(socket_desc);
 
-	
 	return 0;
 }
