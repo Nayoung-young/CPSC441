@@ -7,7 +7,7 @@
 #define SERVER_IP "127.0.0.1" 
 
 #define PORT_TCP 9000
-#define PORT_UDP 9000
+#define PORT_UDP 8888
 
 int main(int argc , char *argv[])
 {
@@ -44,18 +44,12 @@ int main(int argc , char *argv[])
 		printf("Could not create socket\n");
 	}
 
-    server_UDP.sin_family = AF_INET;
-	server_UDP.sin_addr.s_addr = INADDR_ANY;
+	server_UDP.sin_addr.s_addr = inet_addr(SERVER_IP);
+	server_UDP.sin_family = AF_INET;
 	server_UDP.sin_port = htons(PORT_UDP);
 
-    if (connect(sock_UDP , (struct sockaddr *)&server_UDP , sizeof(server_UDP)) < 0)
-	{
-		perror("connect failed. Error");
-		return 1;
-	}
-
 	puts("TCP Socket Connected");
-	puts("UDP Socket Connected");
+	puts("UDP Socket Ready\n");
 	
 	//keep communicating with server
 	while(1)
@@ -73,7 +67,7 @@ int main(int argc , char *argv[])
 			puts("Selection Send failed");
 			return 1;
 		} else {
-			puts("Selection Send success");
+			//puts("Selection Send success");
 		}
 
 		if (selection[0]=='1') {
@@ -94,15 +88,19 @@ int main(int argc , char *argv[])
 				puts("Send failed");
 				return 1;
 			} 
-			else puts("Send success");
+			else puts("TCP Send success");
 
-			// receive from server
+			// receive from TCP
 			if( recv(sock_TCP , server_reply_TCP , 5000 , 0) < 0)
 			{
 				puts("TCP recv failed");
 				break;
 			}
-			if( recv(sock_UDP , server_reply_UDP , 5000 , 0) < 0)
+
+			// receive from UDP
+			int len;
+			if( recvfrom(sock_UDP , server_reply_UDP , strlen(server_reply_UDP)
+				, 0, (struct sockaddr *) &server_UDP, (socklen_t *)&len) < 0)
 			{
 				puts("UDP recv failed");
 				break;

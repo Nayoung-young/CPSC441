@@ -7,7 +7,7 @@
 int main(int argc, char *argv[]){
 
 	int socket_desc, client_sock;
-	struct sockaddr_in server, client;
+	struct sockaddr_in server;
 	char client_message[5000];
 
 	
