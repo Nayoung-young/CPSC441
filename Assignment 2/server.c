@@ -7,7 +7,10 @@
 #define SERVER_IP "127.0.0.1" 
 
 #define PORT_TCP 9000
-#define PORT_UDP 8888
+#define PORT_UDP 9000
+
+#define VERSION "SIMPLE"
+//#define VERSION "ADVANCED"
 
 int vowel_check(char c) {
     if (c == 'a'|| c =='A') 
@@ -31,7 +34,7 @@ int main(int argc, char *argv[]){
     printf("=============================\n\n");
 
     int socket_TCP, socket_UDP, client_TCP, client_UDP; 
-    struct sockaddr_in server_TCP, server_UDP, 
+    struct sockaddr_in server, 
         client_sock_UDP, client_sock_TCP; 
     char client_message[5000];
 
@@ -42,12 +45,12 @@ int main(int argc, char *argv[]){
 		printf("Could not create socket\n");
 	}
 
-    server_TCP.sin_family = AF_INET;
-	server_TCP.sin_addr.s_addr = INADDR_ANY;
-	server_TCP.sin_port = htons(PORT_TCP);
+    server.sin_family = AF_INET;
+	server.sin_addr.s_addr = INADDR_ANY;
+	server.sin_port = htons(PORT_TCP);
 
     int bindStatus = 0;
-    bindStatus = bind(socket_TCP, (struct sockaddr *)&server_TCP, sizeof(server_TCP));
+    bindStatus = bind(socket_TCP, (struct sockaddr *)&server, sizeof(server));
 	if( bindStatus == -1){
 		//print the error message
 		perror("Binding failed!!");
@@ -65,11 +68,11 @@ int main(int argc, char *argv[]){
 		printf("Could not create socket\n");
 	}
 
-    server_UDP.sin_family = AF_INET;
-	server_UDP.sin_addr.s_addr = INADDR_ANY;
-	server_UDP.sin_port = htons(PORT_UDP);
+    // server_UDP.sin_family = AF_INET;
+	// server_UDP.sin_addr.s_addr = INADDR_ANY;
+	// server_UDP.sin_port = htons(PORT_UDP);
 
-    bindStatus = bind(socket_UDP, (struct sockaddr *)&server_UDP, sizeof(server_UDP));
+    bindStatus = bind(socket_UDP, (struct sockaddr *)&server, sizeof(server));
 	if( bindStatus == -1){
 		//print the error message
 		perror("Binding failed");
@@ -87,20 +90,21 @@ int main(int argc, char *argv[]){
 		perror("client_TCP Connection failed\n");
 		return 1;
 	}
+    
 
     printf("Client Connection accepted...\n\n");
 
     //Receive a message from client
     int recvStatus;
-    char client_selection[2];
+    char client_selection[10];
 
 	while(1){
         recvStatus = recv(client_TCP, client_selection, 5000, 0);
-        if (recvStatus==-1){
+        if (recvStatus == -1){
             printf("Error in receiving!");
             break;
         }
-        printf("Client selected: %s\n", client_selection);
+        else printf("Client selected: %s\n", client_selection);
 
         if (client_selection[0] == '1') {
             // devowel 
@@ -111,33 +115,35 @@ int main(int argc, char *argv[]){
             }
             printf("String to Devowel: %s\n", client_message);
 
-            char vowel_TCP[1000], nonvowel_UDP[1000];
+            char vowel_UDP[5000], nonvowel_TCP[5000];
             char ch = client_message[0]; 
             int i = 0; 
-            char blank[5] = " ";
+            char blank[2] = " ";
 
             while (i < (int)strlen(client_message)) {
                 // if vowel 
                 if (vowel_check(ch)){
-                    strncat(vowel_TCP, &ch, 1);
-                    strcat(nonvowel_UDP, blank);
+                    strncat(vowel_UDP, &ch, 1);
+                    strncat(nonvowel_TCP, &blank[0], 1);
                 }
                 // if non-vowel 
                 else {
-                    strncat(nonvowel_UDP, &ch, 1);
-                    strcat(vowel_TCP, blank);
+                    strncat(nonvowel_TCP, &ch, 1);
+                    strncat(vowel_UDP, &blank[0], 1);
                 }
                 ch = client_message[++i];
             }
-            write(client_TCP, vowel_TCP, strlen(vowel_TCP));
-            write(client_UDP, nonvowel_UDP, strlen(nonvowel_UDP));
+            printf("Loop i is done!\n");
+            
+            //send(client_TCP , nonvowel_TCP , strlen(nonvowel_TCP) , 0);
+            //send(client_UDP , vowel_UDP , strlen(vowel_UDP) , 0);
+            write(client_TCP, nonvowel_TCP, strlen(nonvowel_TCP));
+            write(client_UDP, vowel_UDP, strlen(vowel_UDP)); // 왜 이게 화면에 보여
         }
         else if (client_selection[1] == '2'){
             printf("~~\n");
-        } else {
-            break;
-        }
-
+        } 
+        else break;
         // char serverMsg[5000];
         // strcat(serverMsg,"Hello FROM NAYOUNG");
         // // strcat(serverMsg, client_message);
