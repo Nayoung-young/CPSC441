@@ -13,31 +13,16 @@
 #define VERSION "SIMPLE"
 //#define VERSION "ADVANCED"
 
-int vowel_check(char c) {
-    if (c == 'a'|| c =='A') 
-        return 1;
-    if (c == 'e'|| c =='E') 
-        return 1;
-    if (c == 'i'|| c =='I') 
-        return 1;
-    if (c == 'o'|| c =='O') 
-        return 1;
-    if (c == 'u'|| c =='U') 
-        return 1;
-    else 
-        return 0;
-}
-
 int main(int argc, char *argv[]){
 
     printf("=============================\n");
     printf("Hello, this is vowelizer Server\n");
     printf("=============================\n\n");
 
-    int socket_TCP, socket_UDP, client_TCP, client_UDP; 
+    int socket_TCP, socket_UDP, client_TCP; 
     struct sockaddr_in server_TCP, server_UDP;
         //client_sock_UDP, client_sock_TCP; 
-    char client_message[5000];
+    char client_vowel[5000], client_nonvowel[5000];
 
     // create TCP 
     socket_TCP = socket(AF_INET, SOCK_STREAM, 0);
@@ -87,7 +72,7 @@ int main(int argc, char *argv[]){
 		perror("UDP Binding failed");
 		return 1;
 	}
-    puts("UDP Socket is running now...");
+    puts("UDP Socket is running now...\n");
 
     //Receive a message from client
     int recvStatus;
@@ -100,53 +85,45 @@ int main(int argc, char *argv[]){
             break;
         }
         else printf("Client selected: %s\n", client_selection);
-
+        
         if (client_selection[0] == '1') {
-            // devowel 
-            recvStatus = recv(client_TCP, client_message, 5000, 0);
+            // recv - TCP 
+            recvStatus = recv(client_TCP, client_nonvowel, 5000, 0);
             if (recvStatus==-1) {
                 printf("Error in receiving!");
                 break;
             }
-            printf("String to Devowel: %s\n", client_message);
+            //else printf("TCP nonvowels: %s\n", client_nonvowel);
+            // send - TCP
+            if (send(client_TCP, client_nonvowel, strlen(client_nonvowel), 0) <0 ) {
+                printf("TCP nonvowels Send Failed\n");
+            } else printf("\nTCP nonvowels Send Success\n");
 
-            char vowel_UDP[5000], nonvowel_TCP[5000];
-            char ch = client_message[0]; 
-            int i = 0; 
-            char blank[2] = " ";
+            // recv - UDP 
+            struct sockaddr_in cliaddr;
+            int n, len; 
+            len = sizeof(cliaddr);
 
-            while (i < (int)strlen(client_message)) {
-                // if vowel 
-                if (vowel_check(ch)){
-                    strncat(vowel_UDP, &ch, 1);
-                    strncat(nonvowel_TCP, &blank[0], 1);
-                }
-                // if non-vowel 
-                else {
-                    strncat(nonvowel_TCP, &ch, 1);
-                    strncat(vowel_UDP, &blank[0], 1);
-                }
-                ch = client_message[++i];
+            n = recvfrom(socket_UDP, client_vowel, 5000,
+                0, ( struct sockaddr *) &cliaddr, &len); 
+            if (n < 0) {
+                printf("UDP vowels recv Failed\n");
             }
-            printf("Vowelling is done!\n");
-            
-            //send(client_TCP , nonvowel_TCP , strlen(nonvowel_TCP) , 0);
-            //send(client_UDP , vowel_UDP , strlen(vowel_UDP) , 0);
-            send(client_TCP, nonvowel_TCP, strlen(nonvowel_TCP));
-
-            struct sockaddr *client; 
-            struct sockaddr_in ip_client;
-            client = (struct sockaddr *)&ip_client; 
-            
-            if (sendto(client_UDP, vowel_UDP,
-                strlen(vowel_UDP), 0, client, sizeof(client))==-1) {
+            else {
+                client_vowel[n] = '\0';
+                //printf("UDP vowels: %s\n", client_vowel);
+            }
+            // send - UDP 
+            if (sendto(socket_UDP, client_vowel,
+                strlen(client_vowel), 0, (const struct sockaddr*)&cliaddr, sizeof(cliaddr)) <0) 
+            {
                     puts("UDP send Failed");
-            }
+            } 
+            else printf("UDP vowels send success\n\n");
         }
         else if (client_selection[1] == '2'){
             printf("~~\n");
         } 
-        else break;
         // char serverMsg[5000];
         // strcat(serverMsg,"Hello FROM NAYOUNG");
         // // strcat(serverMsg, client_message);
@@ -156,7 +133,6 @@ int main(int argc, char *argv[]){
 		
 	}
 
-    close(client_TCP);
     close(client_TCP);
     close(socket_UDP);
     close(socket_TCP);

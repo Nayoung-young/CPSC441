@@ -9,6 +9,23 @@
 #define PORT_TCP 9000
 #define PORT_UDP 8888
 
+#define MAX_LENGTH 5000
+
+int is_vowel(char c) {
+    if (c == 'a'|| c =='A') 
+        return 1;
+    if (c == 'e'|| c =='E') 
+        return 1;
+    if (c == 'i'|| c =='I') 
+        return 1;
+    if (c == 'o'|| c =='O') 
+        return 1;
+    if (c == 'u'|| c =='U') 
+        return 1;
+    else 
+        return 0;
+}
+
 int main(int argc , char *argv[])
 {
 	printf("=============================\n");
@@ -71,24 +88,63 @@ int main(int argc , char *argv[])
 		}
 
 		if (selection[0]=='1') {
-			//printf("You are in selection[0] == i!\n");
-			puts("You selected 1");
+			puts("\nYou selected 1");
 			printf("Enter your message to devowel: ");
-			//fgets(message, 1000,stdin);
 			//scanf("%[^\n]s", message);
-			scanf("%s[^\n]", message);
+			while(getchar()!='\n');
+			fgets(message, sizeof(message), stdin);
+			message[strlen(message)-1] ='\0';
 
 			if ((int)strlen(message) < 1) {
 				puts("please input message");
 				return 1;
 			}
-			// send message
-			if( send(sock_TCP , message , strlen(message) , 0) < 0)
+			
+			char vowel_UDP[5000], nonvowel_TCP[5000];
+            char ch = message[0]; 
+            int i = 0; 
+            char blank = ' ';
+			while (i < (int)strlen(message)) {
+                // if vowel 
+                if (is_vowel(ch)){
+                    strncat(vowel_UDP, &ch, 1);
+                    strncat(nonvowel_TCP, &blank, 1);
+                }
+                // if non-vowel 
+                else {
+                    strncat(nonvowel_TCP, &ch, 1);
+                    strncat(vowel_UDP, &blank, 1);
+                }
+                ch = message[++i];
+            }
+            //printf("Vowelling is done!\n");
+			//printf("nonvowels: %s, vowels: %s\n", nonvowel_TCP, vowel_UDP);
+
+			// send vowels on UDP 
+			int len = sizeof(server_UDP);
+			if (sendto(sock_UDP, vowel_UDP, strlen(vowel_UDP),
+        		0, (const struct sockaddr *) &server_UDP, sizeof(server_UDP))<0) 
 			{
-				puts("Send failed");
+				puts("UDP Send failed");
+				return 1;
+			}
+			//else puts("UDP Send success");
+
+			// send nonvowels on TCP 
+			if( send(sock_TCP , nonvowel_TCP , strlen(nonvowel_TCP) , 0) < 0)
+			{
+				puts("TCP Send failed");
 				return 1;
 			} 
-			else puts("TCP Send success");
+			//else puts("TCP Send success");
+
+			// receive from UDP
+			int n = recvfrom(sock_UDP , server_reply_UDP , 5000
+				, 0, (struct sockaddr *) &server_UDP, &len);
+			if( n < 0) {
+				puts("UDP recv failed");
+				break;
+			} else printf("\nServer sent vowels on UDP  : \'%s\'\n", server_reply_UDP);
 
 			// receive from TCP
 			if( recv(sock_TCP , server_reply_TCP , 5000 , 0) < 0)
@@ -96,26 +152,41 @@ int main(int argc , char *argv[])
 				puts("TCP recv failed");
 				break;
 			}
-
-			// receive from UDP
-			int len;
-			if( recvfrom(sock_UDP , server_reply_UDP , strlen(server_reply_UDP)
-				, 0, (struct sockaddr *) &server_UDP, (socklen_t *)&len) < 0)
-			{
-				puts("UDP recv failed");
-				break;
-			}
-
-			printf("Server sent %zu bytes of non-vowels on TCP: %s\n", strlen(server_reply_TCP), 
-				server_reply_TCP);
-
-			printf("Server sent %zu bytes of vowels on UDP: %s\n", strlen(server_reply_UDP),
-				server_reply_UDP);
+			else printf("Server sent non-vowels on TCP: \'%s\'\n\n", server_reply_TCP);
 			
 		} 
 		else if (selection[0] == '2') {
+			char nonvowel[1000], vowel[1000];
+
 			puts("You selected 2");
-			// send message
+			printf("Enter non-vowel part of message to envowel: ");
+			while(getchar()!='\n');
+			fgets(nonvowel, sizeof(nonvowel), stdin);
+			nonvowel[strlen(nonvowel)-1] ='\0';
+
+			printf("Enter     vowel part of message to envowel: ");
+			//while(getchar()!='\n');
+			fgets(vowel, sizeof(vowel), stdin);
+			nonvowel[strlen(vowel)-1] ='\0';
+			
+			printf("\nThis is nonvowel part input: %s\n", nonvowel);
+			printf("This is vowel part input: %s\n\n", vowel);
+
+			if (strlen(vowel) != strlen(nonvowel)) {
+				puts("you should input right vowels and nonvowels");
+				return 1;
+			}
+			
+			// envowel 
+			int j = 0;
+			char ch = vowel[0];
+			char blank = ' ';
+
+			while(j < strlen(vowel)) {
+				// ch is blank
+
+			}
+
 		} 
 		else if (selection[0] == '3') {
 			puts("Program exit");
@@ -127,70 +198,7 @@ int main(int argc , char *argv[])
 			break; 
 		}
 		
-		// if (selection[0]=='1') {
-		// 	printf("You selected 1\n");
-		// 	printf("Enter your message to devowel: ");
-		// 	scanf("%[^\n]s", message);
-
-		// 	// send message
-		// 	if( send(sock_TCP , message , strlen(message) , 0) < 0)
-		// 	{
-		// 		puts("Send failed");
-		// 		return 1;
-		// 	} 
-		// 	else {
-		// 		puts("Words to devowel Sent!");
-		// 	}
-
-		// 	// receive from server
-		// 	if( recv(sock_TCP , server_reply_TCP , 2000 , 0) < 0)
-		// 	{
-		// 		puts("TCP recv failed");
-		// 		break;
-		// 	}
-		// 	if( recv(sock_UDP , server_reply_UDP , 2000 , 0) < 0)
-		// 	{
-		// 		puts("UDP recv failed");
-		// 		break;
-		// 	}
-
-		// 	printf("Server sent %zu bytes of non-vowels on TCP: ", strlen(server_reply_TCP));
-		// 	puts(server_reply_TCP);
-
-		// 	printf("Server sent %zu bytes of vowels on UDP: ", strlen(server_reply_UDP));
-		// 	puts(server_reply_UDP);
-			
-		// } 
-		// else if (selection[0] == '2') {
-		// 	puts("You selected 2\n");
-		// 	// send message
-		// } 
-		// else if (selection[0] == '3') {
-		// 	puts("Program exit\n");
-		// 	break;
-		// } 
-		// else {
-		// 	puts("you have to make a selection in 1, 2, 3\n"); 
-		// 	puts("Program exit\n");
-		// 	break; 
-		// }
 		
-		//Send some data
-		// if( send(sock , message , strlen(message) , 0) < 0)
-		// {
-		// 	puts("Send failed");
-		// 	return 1;
-		// }
-		
-		// //Receive a reply from the server
-		// if( recv(sock , server_reply , 2000 , 0) < 0)
-		// {
-		// 	puts("recv failed");
-		// 	break;
-		// }
-		
-		// puts("Server reply :");
-		// puts(server_reply);
 	}
 	
 	close(sock_TCP);
