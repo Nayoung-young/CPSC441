@@ -4,16 +4,14 @@
 #include <arpa/inet.h>	//inet_addr
 #include <unistd.h>
 
-//#define SERVER_IP "127.0.0.1" 
-#define SERVER_IP "136.159.5.27" 
+#define SERVER_IP "127.0.0.1" 
+//#define SERVER_IP "136.159.5.27" 
 
 #define ADVANCED 1
 //#define ADVANCED 0
 
 #define PORT_TCP 9000
 #define PORT_UDP 8888
-
-#define MAX_LENGTH 5000
 
 int is_vowel(char c) {
     if (c == 'a'|| c =='A') 
@@ -78,7 +76,7 @@ int main(int argc , char *argv[])
 		printf("Please choose from the following selections:\n");
 		printf("	1 - Devowel a message\n");
 		printf("	2 - Envowel a message\n");
-		printf("	3 - Exit program\n");
+		printf("	0 - Exit program\n");
 		printf("Your desired menu selection?: ");
 		scanf("%s", selection);
 
@@ -109,8 +107,8 @@ int main(int argc , char *argv[])
             int i = 0; 
             char blank = ' ';
 
-			int a = 0;
 			if (ADVANCED) {
+				int a = 0;
 				while (i < (int)strlen(message)) {
 					// if non-vowel 
 					if (!is_vowel(ch)){
@@ -129,7 +127,9 @@ int main(int argc , char *argv[])
 				}
 			} 
 			else {
+				printf("this is SIMPLE devowel\n");
 				while (i < (int)strlen(message)) {
+					printf("this is SIMPLE LOOP: %d\n",i );
 					// if vowel 
 					if (is_vowel(ch)){
 						strncat(vowel_UDP, &ch, 1);
@@ -144,8 +144,8 @@ int main(int argc , char *argv[])
 				}
 			}
 			
-            //printf("Vowelling is done!\n");
-			//printf("nonvowels: %s, vowels: %s\n", nonvowel_TCP, vowel_UDP);
+            printf("Vowelling is done!\n");
+			printf("nonvowels: %s, vowels: %s\n", nonvowel_TCP, vowel_UDP);
 
 			// send vowels on UDP 
 			int len = sizeof(server_UDP);
@@ -199,45 +199,71 @@ int main(int argc , char *argv[])
 			//printf("\nThis is nonvowel part input: \'%s\'\n", nonvowel);
 			//printf("This is    vowel part input: \'%s\'\n", vowel);
 
-			int k; 
-			if (strlen(vowel) < strlen(nonvowel)) {
-				k = strlen(vowel); 
-				while (k < strlen(nonvowel)) {
-					vowel[k++] = ' ';
-				}
-				vowel[k] ='\0';
-			} else if (strlen(vowel) > strlen(nonvowel)) {
-				k = strlen(nonvowel);
-				while (k < strlen(vowel)) {
-					nonvowel[k++] = ' ';
-				}
-				nonvowel[k] ='\0';
-			}
-
-			//printf("\nThis is nonvowel part input: \'%s\'\n", nonvowel);
-			//printf("This is    vowel part input: \'%s\'\n", vowel);
-
-			// envowel 
-			int j = 0; // str idx 
-			char blank = ' ';
-			char ch_vowel = vowel[0];
-			char ch_nonvowel = nonvowel[0];
 			char envowel_msg[5000];
-
-			puts("This is envowelizer Loop");
-			while(j < strlen(vowel)) {
-				// vowel[j] is blank
-				//printf("this is j: %i\n", j);
-				if (ch_vowel == blank){
-					strncat(envowel_msg, &ch_nonvowel, 1);
-					//puts("vowel[j] is blank");
-				} else {
-					strncat(envowel_msg, &ch_vowel, 1);
-					//puts("vowel[j] is not blank");
+			if(ADVANCED) {
+				//char tmp = vowel[0];
+				//printf("this is strlen(msg): %i\n", (int)strlen(vowel));
+				int idx_nonvowel = 0; 
+				int idx_vowel = 0; 
+				int b, size; 
+				//printf("This is ADVANCED \n");
+				int k = 0;
+				size = strlen(nonvowel)+strlen(vowel)/2;
+				//printf("this is strlen(envowel_msg): %i\n", (int)strlen(envowel_msg));
+				while (k < size) {
+					b = (int)((char)vowel[idx_vowel])-48;
+					//printf("this is %ith Loop\n", k);
+					while (b > 0) {
+						//printf("	this is %ith Loop\n", b);
+						strncat(envowel_msg, &nonvowel[idx_nonvowel++], 1);
+						b--;
+					}
+					strncat(envowel_msg, &vowel[idx_vowel+1], 1);
+					//printf("this is envowel_msg now: \'%s\'\n", envowel_msg);
+					idx_vowel += 2;
+					k++;
 				}
-				//printf("This is envowel_msg now: %s\n", envowel_msg);
-				ch_vowel = vowel[++j];
-				ch_nonvowel = nonvowel[j];
+			}
+			else {
+				int k; 
+				if (strlen(vowel) < strlen(nonvowel)) {
+					k = strlen(vowel); 
+					while (k < strlen(nonvowel)) {
+						vowel[k++] = ' ';
+					}
+					vowel[k] ='\0';
+				} else if (strlen(vowel) > strlen(nonvowel)) {
+					k = strlen(nonvowel);
+					while (k < strlen(vowel)) {
+						nonvowel[k++] = ' ';
+					}
+					nonvowel[k] ='\0';
+				}
+
+				//printf("\nThis is nonvowel part input: \'%s\'\n", nonvowel);
+				//printf("This is    vowel part input: \'%s\'\n", vowel);
+
+				// envowel 
+				int j = 0; // str idx 
+				char blank = ' ';
+				char ch_vowel = vowel[0];
+				char ch_nonvowel = nonvowel[0];
+
+				while(j < strlen(vowel)) {
+					//puts("This is envowelizer Loop");
+					// vowel[j] is blank
+					//printf("this is j: %i\n", j);
+					if (ch_vowel == blank){
+						strncat(envowel_msg, &ch_nonvowel, 1);
+						//puts("vowel[j] is blank");
+					} else {
+						strncat(envowel_msg, &ch_vowel, 1);
+						//puts("vowel[j] is not blank");
+					}
+					//printf("This is envowel_msg now: %s\n", envowel_msg);
+					ch_vowel = vowel[++j];
+					ch_nonvowel = nonvowel[j];
+				}
 			}
 			printf("Envowel is done in client-side: %s\n", envowel_msg);
 
@@ -257,7 +283,7 @@ int main(int argc , char *argv[])
 			else printf("Server sent envowel results on TCP: \'%s\'\n\n", server_reply_TCP);
 
 		} 
-		else if (selection[0] == '3') {
+		else if (selection[0] == '0') {
 			puts("Program exit");
 			break;
 		} 
