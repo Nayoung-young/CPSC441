@@ -120,16 +120,21 @@ int main(int argc, char *argv[]){
                     puts("UDP send Failed");
             } 
             else printf("UDP vowels send success\n\n");
-        }
-        else if (client_selection[1] == '2'){
-            printf("~~\n");
+
+        } else if (client_selection[0] == '2'){
+            //printf("this is SELECTION 2!\n");
+            char client_envowel[5000];
+            recvStatus = recv(client_TCP, client_envowel, 5000, 0);
+            if (recvStatus==-1) {
+                printf("Error in receiving!");
+                break;
+            }
+            //else printf("TCP nonvowels: %s\n", client_nonvowel);
+            // send - TCP
+            if (send(client_TCP, client_envowel, strlen(client_envowel), 0) <0 ) {
+                printf("TCP client_envowel Send Failed\n");
+            } else printf("\nTCP client_envowel Send Success\n");
         } 
-        // char serverMsg[5000];
-        // strcat(serverMsg,"Hello FROM NAYOUNG");
-        // // strcat(serverMsg, client_message);
-		// write(client_TCP , serverMsg , strlen(serverMsg)); // send msg to client
-		// write(client_UDP , serverMsg , strlen(serverMsg));
-        // // write something to your brower 
 		
 	}
 

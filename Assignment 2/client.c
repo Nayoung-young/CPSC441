@@ -167,25 +167,70 @@ int main(int argc , char *argv[])
 			printf("Enter     vowel part of message to envowel: ");
 			//while(getchar()!='\n');
 			fgets(vowel, sizeof(vowel), stdin);
-			nonvowel[strlen(vowel)-1] ='\0';
+			vowel[strlen(vowel)-1] ='\0';
 			
-			printf("\nThis is nonvowel part input: %s\n", nonvowel);
-			printf("This is vowel part input: %s\n\n", vowel);
+			//printf("\nThis is nonvowel part input: \'%s\'\n", nonvowel);
+			//printf("This is    vowel part input: \'%s\'\n", vowel);
 
-			if (strlen(vowel) != strlen(nonvowel)) {
-				puts("you should input right vowels and nonvowels");
-				return 1;
+			int k; 
+			if (strlen(vowel) < strlen(nonvowel)) {
+				k = strlen(vowel); 
+				while (k < strlen(nonvowel)) {
+					vowel[k++] = ' ';
+				}
+				vowel[k] ='\0';
+			} else if (strlen(vowel) > strlen(nonvowel)) {
+				k = strlen(nonvowel);
+				while (k < strlen(vowel)) {
+					nonvowel[k++] = ' ';
+				}
+				nonvowel[k] ='\0';
 			}
-			
+
+			//printf("\nThis is nonvowel part input: \'%s\'\n", nonvowel);
+			//printf("This is    vowel part input: \'%s\'\n", vowel);
+
 			// envowel 
-			int j = 0;
-			char ch = vowel[0];
+			int j = 0; // str idx 
 			char blank = ' ';
+			char ch_vowel = vowel[0];
+			char ch_nonvowel = nonvowel[0];
+			char envowel_msg[5000];
 
+			puts("This is envowelizer Loop");
 			while(j < strlen(vowel)) {
-				// ch is blank
-
+				// vowel[j] is blank
+				//printf("this is j: %i\n", j);
+				if (ch_vowel == blank){
+					strncat(envowel_msg, &ch_nonvowel, 1);
+					//puts("vowel[j] is blank");
+				} else {
+					strncat(envowel_msg, &ch_vowel, 1);
+					//puts("vowel[j] is not blank");
+				}
+				//printf("This is envowel_msg now: %s\n", envowel_msg);
+				ch_vowel = vowel[++j];
+				ch_nonvowel = nonvowel[j];
 			}
+			printf("Envowel is done in client-side: %s\n", envowel_msg);
+
+			// send to TCP
+			if( send(sock_TCP , envowel_msg , strlen(envowel_msg) , 0) < 0)
+			{
+				puts("TCP Send failed");
+				return 1;
+			} 
+
+			// recv from TCP
+			if( recv(sock_TCP , server_reply_TCP , 5000 , 0) < 0)
+			{
+				puts("TCP recv failed");
+				break;
+			}
+			else printf("Server sent envowel results on TCP: \'%s\'\n\n", server_reply_TCP);
+
+
+
 
 		} 
 		else if (selection[0] == '3') {
