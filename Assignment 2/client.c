@@ -4,7 +4,11 @@
 #include <arpa/inet.h>	//inet_addr
 #include <unistd.h>
 
-#define SERVER_IP "127.0.0.1" 
+//#define SERVER_IP "127.0.0.1" 
+#define SERVER_IP "136.159.5.27" 
+
+#define ADVANCED 1
+//#define ADVANCED 0
 
 #define PORT_TCP 9000
 #define PORT_UDP 8888
@@ -37,7 +41,7 @@ int main(int argc , char *argv[])
 	char selection[2], message[1000] , 
 		server_reply_UDP[2000], server_reply_TCP[2000];
 
-	// crate TCP 
+	// create TCP 
 	sock_TCP = socket(AF_INET , SOCK_STREAM , 0);
 	if (sock_TCP == -1)
 	{
@@ -104,19 +108,42 @@ int main(int argc , char *argv[])
             char ch = message[0]; 
             int i = 0; 
             char blank = ' ';
-			while (i < (int)strlen(message)) {
-                // if vowel 
-                if (is_vowel(ch)){
-                    strncat(vowel_UDP, &ch, 1);
-                    strncat(nonvowel_TCP, &blank, 1);
-                }
-                // if non-vowel 
-                else {
-                    strncat(nonvowel_TCP, &ch, 1);
-                    strncat(vowel_UDP, &blank, 1);
-                }
-                ch = message[++i];
-            }
+
+			int a = 0;
+			if (ADVANCED) {
+				while (i < (int)strlen(message)) {
+					// if non-vowel 
+					if (!is_vowel(ch)){
+						strncat(nonvowel_TCP, &ch, 1);
+						//strncat(nonvowel_TCP, &blank, 1);
+						a++;
+					}
+					// if vowel 
+					else {
+						char tmp = a+'0'; 
+						strncat(vowel_UDP, &tmp, 1);
+						strncat(vowel_UDP, &ch, 1);
+						a = 0;
+					}
+					ch = message[++i];
+				}
+			} 
+			else {
+				while (i < (int)strlen(message)) {
+					// if vowel 
+					if (is_vowel(ch)){
+						strncat(vowel_UDP, &ch, 1);
+						strncat(nonvowel_TCP, &blank, 1);
+					}
+					// if non-vowel 
+					else {
+						strncat(nonvowel_TCP, &ch, 1);
+						strncat(vowel_UDP, &blank, 1);
+					}
+					ch = message[++i];
+				}
+			}
+			
             //printf("Vowelling is done!\n");
 			//printf("nonvowels: %s, vowels: %s\n", nonvowel_TCP, vowel_UDP);
 
@@ -144,7 +171,7 @@ int main(int argc , char *argv[])
 			if( n < 0) {
 				puts("UDP recv failed");
 				break;
-			} else printf("\nServer sent vowels on UDP  : \'%s\'\n", server_reply_UDP);
+			} else printf("\nServer sent     vowels on UDP: \'%s\'\n", server_reply_UDP);
 
 			// receive from TCP
 			if( recv(sock_TCP , server_reply_TCP , 5000 , 0) < 0)
@@ -228,9 +255,6 @@ int main(int argc , char *argv[])
 				break;
 			}
 			else printf("Server sent envowel results on TCP: \'%s\'\n\n", server_reply_TCP);
-
-
-
 
 		} 
 		else if (selection[0] == '3') {

@@ -4,14 +4,11 @@
 #include<arpa/inet.h>	//inet_addr
 #include<unistd.h>	//write
 
-#define SERVER_IP "127.0.0.1"
-//#define SERVER_IP "136.159.5.27" 
+//#define SERVER_IP "127.0.0.1"
+#define SERVER_IP "136.159.5.27" 
 
 #define PORT_TCP 9000
 #define PORT_UDP 8888
-
-#define VERSION "SIMPLE"
-//#define VERSION "ADVANCED"
 
 int main(int argc, char *argv[]){
 
@@ -97,7 +94,8 @@ int main(int argc, char *argv[]){
             // send - TCP
             if (send(client_TCP, client_nonvowel, strlen(client_nonvowel), 0) <0 ) {
                 printf("TCP nonvowels Send Failed\n");
-            } else printf("\nTCP nonvowels Send Success\n");
+            } else printf("\nTCP nonvowels Send Success: \'%s\'\n",
+                client_nonvowel);
 
             // recv - UDP 
             struct sockaddr_in cliaddr;
@@ -119,7 +117,8 @@ int main(int argc, char *argv[]){
             {
                     puts("UDP send Failed");
             } 
-            else printf("UDP vowels send success\n\n");
+            else printf("UDP    vowels send success: \'%s\'\n\n"
+                , client_vowel);
 
         } else if (client_selection[0] == '2'){
             //printf("this is SELECTION 2!\n");
@@ -133,7 +132,8 @@ int main(int argc, char *argv[]){
             // send - TCP
             if (send(client_TCP, client_envowel, strlen(client_envowel), 0) <0 ) {
                 printf("TCP client_envowel Send Failed\n");
-            } else printf("\nTCP client_envowel Send Success\n");
+            } else printf("\nTCP client_envowel Send Success : \'%s\'\n",
+                client_envowel);
         } 
 		
 	}
