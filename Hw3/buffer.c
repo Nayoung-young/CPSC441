@@ -6,7 +6,7 @@
 /* Buffer size in packets */
 #define MAX_BUFFER 100 
 
-/* Wireless link data rate <- link transmission rate? */ 
+/* Wireless link data rate <- link transmission rate? bits/sec */ 
 #define SPEED 3000000.0
 
 typedef struct {
@@ -57,10 +57,10 @@ int main() {
     
     float now, prev, elapsed; // 시간? 
 
-    int pktsin, pktsout, pktslots; 
+    int pktsin, pktsout, pktslost; 
     int bytesin, bytesout, byteslost;
 
-    int pktsinq, bytesinq; // 얘네 둘은 뭐지 
+    int pktsinq, bytesinq; // ??
     int maxpkts, maxbytes; 
 
     int pktSize;
@@ -68,12 +68,12 @@ int main() {
     float atime;
     Queue atimesQueue; // 각 pkt의 도착 시간 저장 
 
-    float departure;
+    float departure; // ??
     float totdelay, avgdelay;
 
     int totpkts; // 전체 pkt 수? 
     float totKB; // 전체 KB 수? <- loop 중에 계속 + 
-    int credit; 
+    int credit; // ??
 
     int i = 0; // loop count 
 
@@ -81,14 +81,21 @@ int main() {
     queueInit(&sizesQueue);
     queueInit(&atimesQueue);
 
-    pktsin = 0; pktsout = 0; pktslots = 0;
+    // -- pkts Arrive 
+    pktsin = 0; pktsout = 0; pktslost = 0;
+    bytesin = 0; bytesout = 0; byteslost = 0;
+    totdelay = 0; avgdelay = 0; 
+    maxpkts = 0; maxbytes = 0;
+    pktsinq = 0; bytesinq = 0;
+    
     while (fscanf(stdin, "%f %i", &atime, &pktSize) != EOF)
 	{   
         // -- test 
-        if (i> 5) break;
-        else printf("The %dth LOOP\n", i);
+        // if (i> 5) break;
+        // else printf("The %dth LOOP\n", i);
+        // printf("The %dth LOOP\n", i);
 
-        printf("now pkt atime, size: %f, %d\n", atime, pktSize);
+        // printf("now pkt atime, size: %f, %d\n", atime, pktSize);
 
         // dequeue (transmit)
         while(1) {
@@ -98,13 +105,20 @@ int main() {
                 break;
             }
 
-            if ((queueFront(&atimesQueue) + (queueFront(&sizesQueue)/SPEED)) <= atime) {
-                printf("prev pkt atime: %f, size: %f\n", queueFront(&atimesQueue), queueFront(&sizesQueue));
-                printf("prev pkt transmission time: %f\n", queueFront(&atimesQueue) + (queueFront(&sizesQueue)/SPEED));
+            if ((queueFront(&atimesQueue) + (queueFront(&sizesQueue)*8/SPEED)) <= atime) {
+                // printf("prev pkt atime: %f, size: %fbytes\n", queueFront(&atimesQueue), queueFront(&sizesQueue));
+                // printf("prev pkt transmission time: %f\n", queueFront(&atimesQueue) + (queueFront(&sizesQueue)/SPEED)*8);
+                
+                pktsout ++; bytesout += queueFront(&sizesQueue);
+                pktsinq --; bytesinq -= queueFront(&sizesQueue);
+
+                totdelay += (queueFront(&atimesQueue) + (queueFront(&sizesQueue)/SPEED)*8);
+
                 dequeue(&sizesQueue);
                 dequeue(&atimesQueue);
-                pktsout ++; 
-                printf("DEQUEUE completed\n");
+
+
+                // printf("DEQUEUE completed\n");
             } else { 
                 break;
             }
@@ -115,31 +129,60 @@ int main() {
         if (!isFullQueue(&sizesQueue)){
             enqueue(&sizesQueue, pktSize);
             enqueue(&atimesQueue, atime);
-            printf("ENQUEUE completed:: front - sizes: %i, times: %i\n", sizesQueue.front, atimesQueue.front); 
-            printf("ENQUEUE completed:: rear - sizes: %i, times: %i\n", sizesQueue.rear, atimesQueue.rear); 
-            pktsin++;
+
+            // printf("ENQUEUE completed:: front - sizes: %i, times: %i\n", sizesQueue.front, atimesQueue.front); 
+            // printf("ENQUEUE completed:: rear - sizes: %i, times: %i\n", sizesQueue.rear, atimesQueue.rear); 
+            
+            pktsin++; bytesin += pktSize;
+            pktsinq ++; bytesinq += pktSize; 
+
+            if (maxpkts < pktsinq) maxpkts = pktsinq; 
+            if (maxbytes < bytesinq) maxbytes = bytesinq; 
+
         } else {
             // if buffer is full 
+            pktslost++; byteslost += pktSize;
         }
 
         i ++; 
-        printf("pkts in, out, lots: %i, %i, %i\n\n", pktsin, pktsout, pktslots);
+        // printf("pkts in, out, lots: %i, %i, %i\n\n", pktsin, pktsout, pktslost);
         //printf("%f\t%i\n", atime, size);
 	}
 
-    totpkts = i; 
+    // queue에 남아있는 pkt transmit
+    while(!isEmptyQueue(&sizesQueue)) {
+        pktsout ++; bytesout += queueFront(&sizesQueue);
+        totdelay += queueFront(&atimesQueue) + (queueFront(&sizesQueue)/SPEED)*8;
+        dequeue(&sizesQueue);
+        dequeue(&atimesQueue);
+    }
 
+
+    // Summary 
+    printf("AP Buffer Size: %i pkts\n", MAX_BUFFER);
+    printf("Wireless Link Speed: %f bps\n\n", SPEED);
+
+    // 1. # of incoming packets 
+    totpkts = i; 
+    printf("Incoming traffic: %i pkts\t%i bytes\n", pktsin, bytesin);
+
+    // 2. # of delivered packets
+    printf("Outgoing traffic: %i pkts\t%i bytes\n", pktsout, bytesout);
+
+    // 3. # of lost packets 
+    printf("Discarded traffic: %i pkts\t%i bytes\n", pktslost, byteslost);
+
+    // 4. packet loss percentage <- packetlosts /totpackets
+    printf("Lost traffic: %f%% pkts\n", ((double)pktslost / (double)totpkts * 100));
+
+    printf("Peak occupancy: %d pkts\t%d bytes\n", maxbytes, maxpkts);
+
+    // 5. avg delay
+    avgdelay = totdelay / totpkts;
+    printf("Average queueing delay: %f sec\n", avgdelay);
+
+    printf("Summary: ~~ ??");
 
 	return 0;
 
-    // while (fscanf(stdin, "%i\t%i", atimes[i++], sizes[i++]) != EOF)
-	// {
-	// 	printf("\n==============================\n");
-	// 	printf("%s vs. %s\n", str1, str2);
-	// 	printf("==============================\n");
-
-	// 	distance = min_editdistance(str1, str2);
-
-	// 	printf("\nMinEdit(%s, %s) = %d\n", str1, str2, distance);
-	// }
 }
