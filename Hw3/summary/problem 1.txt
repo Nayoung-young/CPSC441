@@ -1,0 +1,202 @@
+** Zoom 
+Wireless Link Speed: 5000000 bps
+AP Buffer Size: 0 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 0 pkts 0 bytes
+Discarded        traffic: 366277 pkts   398189121 bytes
+Lost             traffic: 100.000000% pkts
+Peak occupancy: 0 pkts  0 bytes
+Average queueing delay: 0.000000 sec
+Summary: 5000000 0 366277 398189121 0 0 366277 398189121 100.000000 0 0 0.000000
+
+AP Buffer Size: 10 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 354665 pkts    386523872 bytes
+Discarded        traffic: 11612 pkts    11613122 bytes
+Lost             traffic: 3.170278% pkts
+Peak occupancy: 10 pkts 14562 bytes
+Average queueing delay: 0.001689 sec
+Summary: 5000000 10 366277 398189121 354665 386523872 11612 11613122 3.170278 10 14562 0.001689
+
+AP Buffer Size: 20 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 364935 pkts    396906336 bytes
+Discarded        traffic: 1342 pkts     1220812 bytes
+Lost             traffic: 0.366389% pkts
+Peak occupancy: 20 pkts 26521 bytes
+Average queueing delay: 0.001734 sec
+Summary: 5000000 20 366277 398189121 364935 396906336 1342 1220812 0.366389 20 26521 0.001734
+
+AP Buffer Size: 30 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 365872 pkts    397775328 bytes
+Discarded        traffic: 405 pkts      350892 bytes
+Lost             traffic: 0.110572% pkts
+Peak occupancy: 30 pkts 36700 bytes
+Average queueing delay: 0.001738 sec
+Summary: 5000000 30 366277 398189121 365872 397775328 405 350892 0.110572 30 36700 0.001738
+
+AP Buffer Size: 40 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 366164 pkts    398019744 bytes
+Discarded        traffic: 113 pkts      106306 bytes
+Lost             traffic: 0.030851% pkts
+Peak occupancy: 40 pkts 46269 bytes
+Average queueing delay: 0.001739 sec
+Summary: 5000000 40 366277 398189121 366164 398019744 113 106306 0.030851 40 46269 0.001739
+
+AP Buffer Size: 50 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 366253 pkts    398100640 bytes
+Discarded        traffic: 24 pkts       25320 bytes
+Lost             traffic: 0.006552% pkts
+Peak occupancy: 50 pkts 58510 bytes
+Average queueing delay: 0.001739 sec
+Summary: 5000000 50 366277 398189121 366253 398100640 24 25320 0.006552 50 58510 0.001739
+
+AP Buffer Size: 60 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 366272 pkts    398120544 bytes
+Discarded        traffic: 5 pkts        5493 bytes
+Lost             traffic: 0.001365% pkts
+Peak occupancy: 60 pkts 70310 bytes
+Average queueing delay: 0.001739 sec
+Summary: 5000000 60 366277 398189121 366272 398120544 5 5493 0.001365 60 70310 0.001739
+
+AP Buffer Size: 70 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 366277 pkts    398126048 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 65 pkts 75803 bytes
+Average queueing delay: 0.001740 sec
+Summary: 5000000 70 366277 398189121 366277 398126048 0 0 0.000000 65 75803 0.001740
+
+AP Buffer Size: 80 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 366277 pkts    398126048 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 65 pkts 75803 bytes
+Average queueing delay: 0.001740 sec
+Summary: 5000000 80 366277 398189121 366277 398126048 0 0 0.000000 65 75803 0.001740
+
+AP Buffer Size: 90 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 366277 pkts    398126048 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 65 pkts 75803 bytes
+Average queueing delay: 0.001740 sec
+Summary: 5000000 90 366277 398189121 366277 398126048 0 0 0.000000 65 75803 0.001740
+
+AP Buffer Size: 100 pkts
+Incoming(Total) traffic: 366277 pkts    398189121 bytes
+Outgoing        traffic: 366277 pkts    398126048 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 65 pkts 75803 bytes
+Average queueing delay: 0.001740 sec
+Summary: 5000000 100 366277 398189121 366277 398126048 0 0 0.000000 65 75803 0.001740
+
+** Soccer
+Wireless Link Speed: 5000000 bps
+AP Buffer Size: 0 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 0 pkts 0 bytes
+Discarded        traffic: 689509 pkts   1004382520 bytes
+Lost             traffic: 100.000000% pkts
+Peak occupancy: 0 pkts  0 bytes
+Average queueing delay: 0.000000 sec
+Summary: 5000000 0 689509 1004382520 0 0 689509 1004382520 100.000000 0 0 0.000000 
+
+Wireless Link Speed: 5000000 bps
+AP Buffer Size: 10 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 465193 pkts    679368064 bytes
+Discarded        traffic: 224316 pkts   323584420 bytes
+Lost             traffic: 32.532715% pkts
+Peak occupancy: 10 pkts 15000 bytes
+Average queueing delay: 0.001577 sec
+Summary: 5000000 10 689509 1004382520 465193 679368064 224316 323584420 32.532715 10 15000 0.001577
+
+AP Buffer Size: 20 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 689246 pkts    996704256 bytes
+Discarded        traffic: 263 pkts      381472 bytes
+Lost             traffic: 0.038143% pkts
+Peak occupancy: 20 pkts 30000 bytes
+Average queueing delay: 0.002339 sec
+Summary: 5000000 20 689509 1004382520 689246 996704256 263 381472 0.038143 20 30000 0.002339
+
+AP Buffer Size: 30 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 689509 pkts    997078912 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 21 pkts 31500 bytes
+Average queueing delay: 0.002340 sec
+Summary: 5000000 30 689509 1004382520 689509 997078912 0 0 0.000000 21 31500 0.002340
+
+AP Buffer Size: 40 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 689509 pkts    997078912 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 21 pkts 31500 bytes
+Average queueing delay: 0.002340 sec
+Summary: 5000000 40 689509 1004382520 689509 997078912 0 0 0.000000 21 31500 0.002340
+
+AP Buffer Size: 50 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 689509 pkts    997078912 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 21 pkts 31500 bytes
+Average queueing delay: 0.002340 sec
+Summary: 5000000 50 689509 1004382520 689509 997078912 0 0 0.000000 21 31500 0.002340
+
+AP Buffer Size: 60 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 689509 pkts    997078912 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 21 pkts 31500 bytes
+Average queueing delay: 0.002340 sec
+Summary: 5000000 60 689509 1004382520 689509 997078912 0 0 0.000000 21 31500 0.002340
+
+AP Buffer Size: 70 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 689509 pkts    997078912 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 21 pkts 31500 bytes
+Average queueing delay: 0.002340 sec
+Summary: 5000000 70 689509 1004382520 689509 997078912 0 0 0.000000 21 31500 0.002340
+
+AP Buffer Size: 80 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 689509 pkts    997078912 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 21 pkts 31500 bytes
+Average queueing delay: 0.002340 sec
+Summary: 5000000 80 689509 1004382520 689509 997078912 0 0 0.000000 21 31500 0.002340
+
+AP Buffer Size: 90 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 689509 pkts    997078912 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 21 pkts 31500 bytes
+Average queueing delay: 0.002340 sec
+Summary: 5000000 90 689509 1004382520 689509 997078912 0 0 0.000000 21 31500 0.002340
+
+AP Buffer Size: 100 pkts
+Incoming(Total) traffic: 689509 pkts    1004382520 bytes
+Outgoing        traffic: 689509 pkts    997078912 bytes
+Discarded        traffic: 0 pkts        0 bytes
+Lost             traffic: 0.000000% pkts
+Peak occupancy: 21 pkts 31500 bytes
+Average queueing delay: 0.002340 sec
+Summary: 5000000 100 689509 1004382520 689509 997078912 0 0 0.000000 21 31500 0.002340
