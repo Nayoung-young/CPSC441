@@ -61,4 +61,25 @@ int main ()
     int mostrecentyodelertostart;
     double mostrecentyodelstarttime, mostrecentyodelendtime; 
 
+    printf("M = %d, S = %f, Y = %f\n
+            Total time observing channel: %f\n
+            \tIdle time on the channel: %f %f%%\n
+            \tMelodius time on channel: %f %f%%\n
+            \tScreech time on the channel: %f %f%%\n\n
+            
+            \tAttempted yodels: %i\n
+            \tPerfect yodels: %i\n
+            \tPerfect yodels/Attempted yodels: %i (%i%%)\n
+            \tPerfect yodel time on the channel: %f %f%%\n",
+            0, 0, 0,
+            0,
+            0, 0,
+            0, 0,
+            0, 0, 
+            0,
+            0,
+            0, 0,
+            0, 0);
+
+
 }
