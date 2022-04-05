@@ -59,12 +59,17 @@ double Exponential(mu)
 int main () 
 {
     int i;
-    int activeindex, nexteventindex, status[M];
+    int currindex, nexteventindex, status[M];
+    int activebozons = 0;
     double duration[M];
 
     int yodeltries = 0, perfectyodels = 0;
     int mostrecentyodelertostart = 0;
     double mostrecentyodelstarttime = 0, mostrecentyodelendtime = 0; 
+
+    // parameters for checking performance 
+    double silenttime = 0, melodiustime = 0, screechytime = 0;
+    double perfectyodeltime = 0;  
 
     // setup status[M], duration[M]
     nexteventindex = 0;
@@ -78,35 +83,56 @@ int main ()
     }
 
     time_t starttime = time(NULL);
+    double currdurtime = 0; 
     // start timer 
     while(starttime - time(NULL) == END_TIME) {
-        activeindex = nexteventindex;
-        usleep(duration[activeindex] * 10^6);
+        currindex = nexteventindex; 
+        currdurtime = duration[currindex];
+
+        // 방금 있었던 공백에 대한 판단 
+        if (activebozons > 1) {
+            // screechy time 
+            screechytime += (time(NULL) - mostrecentyodelstarttime);
+        } else if (activebozons == 1) {
+            // melodius time 
+            melodiustime += (time(NULL) - mostrecentyodelstarttime);
+            if (status[currindex] == YODELING) {
+                // perfect time 
+                perfectyodeltime += (time(NULL) - mostrecentyodelstarttime);
+            }
+        } else if (activebozons == 0) {
+            // silent time 
+            silenttime += (time(NULL) - mostrecentyodelstarttime);
+        } else {
+            prinf("ERROR: ACTIVE BOZONS count error\n");
+            break; 
+        } 
 
         // already yodelling -> stop yodelling 
-        if (status[activeindex] == YODELING) {
-            status[activeindex] == SLEEPING;
-            duration[activeindex] = Exponential(S);
+        if (status[currindex] == YODELING) {
+            status[currindex] == SLEEPING;
+            duration[currindex] = Exponential(S);
             mostrecentyodelendtime = time(NULL);
+            activebozons -= 1; 
         }
         // start yodelling 
         else {
-            duration[activeindex] += Exponential(Y);
-            status[activeindex] = YODELING;
+            status[currindex] = YODELING;
+            duration[currindex] += Exponential(Y);
             yodeltries += 1; 
-            mostrecentyodelertostart = activeindex;
+            mostrecentyodelertostart = currindex;   
             mostrecentyodelstarttime = time(NULL);
+            activebozons += 1;
         }
-        
-        // yodelling이 겹치면? ** 작성 필요 
 
         // modify nexteventindex 
         for (i = 0; i < M; i++) {
-            if (duration[activeindex]>duration[i]) {
+            if (duration[currindex]>duration[i]) {
                 nexteventindex = i;
             } 
         }
 
+        usleep((duration[nexteventindex]-currdurtime) * 10^6);
 
     }
 
@@ -120,17 +146,17 @@ int main ()
             
             \tAttempted yodels: %i\n
             \tPerfect yodels: %i\n
-            \tPerfect yodels/Attempted yodels: %i (%i%%)\n
+            \tPerfect yodels/Attempted yodels: (%i%%)\n
             \tPerfect yodel time on the channel: %f %f%%\n",
-            0, 0, 0,
-            0,
-            0, 0,
-            0, 0,
-            0, 0, 
-            0,
-            0,
-            0, 0,
-            0, 0);
+            M, S, Y,
+            END_TIME,
+            silenttime, silenttime/END_TIME*100,
+            melodiustime, melodiustime/END_TIME*100,
+            screechytime, screechytime/END_TIME*100, 
+            yodeltries,
+            perfectyodels,
+            perfectyodels/yodeltries*100,
+            perfectyodeltime, perfectyodeltime/END_TIME*100);
 
 
 }
