@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <sys/time.h>
+#include <unistd.h>
+//#include <windows.h>
 
 // Constants 
 #define M 0 // # of bozons on the planet 
@@ -17,7 +20,7 @@
 
 // Bozon states 
 #define SLEEPING 0
-#define YODELING 0
+#define YODELING 1
 
 // Yodel duration model 
 #define EXPONENTIAL 1 
@@ -56,11 +59,59 @@ double Exponential(mu)
 int main () 
 {
     int i;
-    int active, nexteventindex, status[M];
-    int yodeltries, perfectyodels;
-    int mostrecentyodelertostart;
-    double mostrecentyodelstarttime, mostrecentyodelendtime; 
+    int activeindex, nexteventindex, status[M];
+    double duration[M];
 
+    int yodeltries = 0, perfectyodels = 0;
+    int mostrecentyodelertostart = 0;
+    double mostrecentyodelstarttime = 0, mostrecentyodelendtime = 0; 
+
+    // setup status[M], duration[M]
+    nexteventindex = 0;
+    for(i=0;i<M;i++){
+        status[i] = SLEEPING;
+        duration[i] = Exponential(S);
+
+        if (duration[nexteventindex]>duration[i]) {
+            nexteventindex = i;
+        }
+    }
+
+    time_t starttime = time(NULL);
+    // start timer 
+    while(starttime - time(NULL) == END_TIME) {
+        activeindex = nexteventindex;
+        usleep(duration[activeindex] * 10^6);
+
+        // already yodelling -> stop yodelling 
+        if (status[activeindex] == YODELING) {
+            status[activeindex] == SLEEPING;
+            duration[activeindex] = Exponential(S);
+            mostrecentyodelendtime = time(NULL);
+        }
+        // start yodelling 
+        else {
+            duration[activeindex] += Exponential(Y);
+            status[activeindex] = YODELING;
+            yodeltries += 1; 
+            mostrecentyodelertostart = activeindex;
+            mostrecentyodelstarttime = time(NULL);
+        }
+        
+        // yodelling이 겹치면? ** 작성 필요 
+
+        // modify nexteventindex 
+        for (i = 0; i < M; i++) {
+            if (duration[activeindex]>duration[i]) {
+                nexteventindex = i;
+            } 
+        }
+
+
+    }
+
+
+    // Summary 
     printf("M = %d, S = %f, Y = %f\n
             Total time observing channel: %f\n
             \tIdle time on the channel: %f %f%%\n
