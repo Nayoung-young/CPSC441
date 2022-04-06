@@ -10,13 +10,13 @@
 //#include <windows.h>
 
 // Constants 
-#define M 0 // # of bozons on the planet 
+#define M 2 // # of bozons on the planet 
 #define S 50.0 // Mean sleep duration 자는 시간 평균? 
 #define Y 60.0 // Mean yodel duration 
 
 // Simulation parameters 
 #define WARM_UP 0.0
-#define END_TIME 1000.0
+#define END_TIME 30.0 // sec
 
 // Bozon states 
 #define SLEEPING 0
@@ -27,7 +27,8 @@
 // #define CONSTANT 1 
 
 // Debugging flags 
-//#define DEBUG 1 
+#define DEBUG 1
+//#define DEBUG 0  
 
 // Parameters for random number generation 
 #define MAX_INT 2147483647 // Max 양수 2^31 -1 
@@ -45,15 +46,40 @@ double Uniform01()
 
 // Generate a random floating point # from an exponential 
 // distribution with mean mu. 
-
-double mu; 
-double Exponential(mu)
+ 
+double Exponential(double mu)
 {
     double randnum, ans; 
     
     randnum = Uniform01();
     ans = -(mu)*log(randnum);
+    if (DEBUG) {printf("\t !! new dur %f generated\n", ans);}
     return ans;
+}
+
+void Checkperformance(double timep, int status, int bozons, double* screechy, double* mel, double* per, int* pernum, double* sil, double sttime) {
+    if (bozons > 1) {
+        // screechy time 
+        *screechy += timep;
+        if (DEBUG) { printf("\t\tCURRENT SCREECH: %f\n", *screechy);}
+    } else if (bozons == 1) {
+        // melodius time 
+        *mel += timep;
+        if (DEBUG) { printf("\t\tCURRENT MEL: %f\n", *mel);}
+        if (status == YODELING) {
+            // perfect time 
+            *per += timep;
+            *pernum += 1; 
+            if (DEBUG) { printf("\t\tCURRENT PERFECT: %f\n", *per);}
+        }
+    } else if (bozons == 0) {
+            // silent time 
+        *sil += timep;
+        if (DEBUG) { printf("\t\tCURRENT SILENT: %f\n", *sil);}
+    } else {
+        printf("ERROR: ACTIVE BOZONS count error\n");
+    }
+    return; 
 }
 
 int main () 
@@ -72,51 +98,48 @@ int main ()
     double perfectyodeltime = 0;  
 
     // setup status[M], duration[M]
+    if (DEBUG) { printf("--SET UP status[M], duration[M]\n");}
     nexteventindex = 0;
     for(i=0;i<M;i++){
         status[i] = SLEEPING;
         duration[i] = Exponential(S);
+        if (DEBUG) { printf("status[%d]: duration::%f\n", i, duration[i]); } 
 
         if (duration[nexteventindex]>duration[i]) {
             nexteventindex = i;
         }
     }
+    if (DEBUG) { printf("\n"); }
 
-    time_t starttime = time(NULL);
+
+    time_t starttime = mostrecentyodelstarttime= time(NULL);
     double currdurtime = 0; 
+    double timepassed = duration[nexteventindex]; 
+
     // start timer 
-    while(starttime - time(NULL) == END_TIME) {
+    if (DEBUG) { printf("-- START LOOP: starttime: %ld\n", starttime); }
+    usleep(timepassed * 1000000);
+
+
+    while(1) {
+        if (DEBUG) { printf("\tcurrent time: %ld\n", time(NULL)); }
+
         currindex = nexteventindex; 
         currdurtime = duration[currindex];
 
-        // 방금 있었던 공백에 대한 판단 
-        if (activebozons > 1) {
-            // screechy time 
-            screechytime += (time(NULL) - mostrecentyodelstarttime);
-        } else if (activebozons == 1) {
-            // melodius time 
-            melodiustime += (time(NULL) - mostrecentyodelstarttime);
-            if (status[currindex] == YODELING) {
-                // perfect time 
-                perfectyodeltime += (time(NULL) - mostrecentyodelstarttime);
-            }
-        } else if (activebozons == 0) {
-            // silent time 
-            silenttime += (time(NULL) - mostrecentyodelstarttime);
-        } else {
-            prinf("ERROR: ACTIVE BOZONS count error\n");
-            break; 
-        } 
-
+        Checkperformance(timepassed, status[currindex], activebozons, &screechytime, &melodiustime, &perfectyodeltime, &perfectyodels, &silenttime, mostrecentyodelstarttime);
+        
         // already yodelling -> stop yodelling 
         if (status[currindex] == YODELING) {
+            if (DEBUG) { printf("\tNow %dth bozon is sleeping\n", currindex);}
             status[currindex] == SLEEPING;
-            duration[currindex] = Exponential(S);
+            duration[currindex] += Exponential(S);
             mostrecentyodelendtime = time(NULL);
             activebozons -= 1; 
         }
         // start yodelling 
         else {
+            if (DEBUG) { printf("\tNow %dth bozon is yodelling\n", currindex);}
             status[currindex] = YODELING;
             duration[currindex] += Exponential(Y);
             yodeltries += 1; 
@@ -124,6 +147,7 @@ int main ()
             mostrecentyodelstarttime = time(NULL);
             activebozons += 1;
         }
+        if (DEBUG) { printf("\t%d bozons in colony are active\n", activebozons);}
 
         // modify nexteventindex 
         for (i = 0; i < M; i++) {
@@ -132,31 +156,40 @@ int main ()
             } 
         }
 
-        usleep((duration[nexteventindex]-currdurtime) * 10^6);
+        if (duration[nexteventindex] > END_TIME) {
+            Checkperformance(timepassed, status[nexteventindex], activebozons, &screechytime, &melodiustime, &perfectyodeltime, &perfectyodels, &silenttime, mostrecentyodelstarttime);
+            break; 
+        }
 
+        if (DEBUG) { printf("\t-- nexteventindex: %d, duration: %f\n\n", nexteventindex, duration[nexteventindex]); }
+        timepassed = (duration[nexteventindex]-currdurtime);
+        usleep( timepassed * 1000000);
+        
     }
-
+    if (DEBUG) {printf("LOOP ENDED\n\n");}
 
     // Summary 
-    printf("M = %d, S = %f, Y = %f\n
-            Total time observing channel: %f\n
-            \tIdle time on the channel: %f %f%%\n
-            \tMelodius time on channel: %f %f%%\n
-            \tScreech time on the channel: %f %f%%\n\n
-            
-            \tAttempted yodels: %i\n
-            \tPerfect yodels: %i\n
-            \tPerfect yodels/Attempted yodels: (%i%%)\n
-            \tPerfect yodel time on the channel: %f %f%%\n",
-            M, S, Y,
-            END_TIME,
-            silenttime, silenttime/END_TIME*100,
-            melodiustime, melodiustime/END_TIME*100,
-            screechytime, screechytime/END_TIME*100, 
-            yodeltries,
-            perfectyodels,
-            perfectyodels/yodeltries*100,
+    printf("M = %d, S = %f, Y = %f\n", M, S, Y); 
+    printf("Total time observing channel: %f\n", END_TIME);
+    printf("\tIdle time on the channel: %f %f%%\n",
+            silenttime, silenttime/END_TIME*100);
+    printf("\tMelodius time on channel: %f %f%%\n",
+            melodiustime, melodiustime/END_TIME*100);
+    printf("\tScreech time on the channel: %f %f%%\n\n",
+            screechytime, screechytime/END_TIME*100);
+    printf("\tAttempted yodels: %d\n",
+            yodeltries);
+    printf("\tPerfect yodels: %d\n",
+            perfectyodels);
+    if (yodeltries == 0) {
+        printf("\tPerfect yodels/Attempted yodels: (nan%%)\n");
+    } else {
+        printf("\tPerfect yodels/Attempted yodels: (%d%%)\n",
+            perfectyodels/yodeltries*100);
+    }
+    
+    printf("\tPerfect yodel time on the channel: %f %f%%\n",
             perfectyodeltime, perfectyodeltime/END_TIME*100);
-
-
+    
+    return 0; 
 }
