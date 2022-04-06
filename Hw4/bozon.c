@@ -10,13 +10,13 @@
 //#include <windows.h>
 
 // Constants 
-#define M 2 // # of bozons on the planet 
-#define S 50.0 // Mean sleep duration 자는 시간 평균? 
+#define M 1 // # of bozons on the planet 
+#define S 60.0 // Mean sleep duration 자는 시간 평균? 
 #define Y 60.0 // Mean yodel duration 
 
 // Simulation parameters 
 #define WARM_UP 0.0
-#define END_TIME 30.0 // sec
+#define END_TIME 1000.0 // sec
 
 // Bozon states 
 #define SLEEPING 0
@@ -132,7 +132,7 @@ int main ()
         // already yodelling -> stop yodelling 
         if (status[currindex] == YODELING) {
             if (DEBUG) { printf("\tNow %dth bozon is sleeping\n", currindex);}
-            status[currindex] == SLEEPING;
+            status[currindex] = SLEEPING;
             duration[currindex] += Exponential(S);
             mostrecentyodelendtime = time(NULL);
             activebozons -= 1; 
@@ -157,7 +157,7 @@ int main ()
         }
 
         if (duration[nexteventindex] > END_TIME) {
-            Checkperformance(timepassed, status[nexteventindex], activebozons, &screechytime, &melodiustime, &perfectyodeltime, &perfectyodels, &silenttime, mostrecentyodelstarttime);
+            Checkperformance(END_TIME-currdurtime, status[nexteventindex], activebozons, &screechytime, &melodiustime, &perfectyodeltime, &perfectyodels, &silenttime, mostrecentyodelstarttime);
             break; 
         }
 
