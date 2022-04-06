@@ -10,13 +10,13 @@
 //#include <windows.h>
 
 // Constants 
-#define M 1 // # of bozons on the planet 
-#define S 60.0 // Mean sleep duration 자는 시간 평균? 
-#define Y 60.0 // Mean yodel duration 
+#define M 3 // # of bozons on the planet 
+#define S 12.0 // Mean sleep duration 자는 시간 평균? 
+#define Y 6.0 // Mean yodel duration 
 
 // Simulation parameters 
 #define WARM_UP 0.0
-#define END_TIME 1000.0 // sec
+#define END_TIME 30.0 // 
 
 // Bozon states 
 #define SLEEPING 0
@@ -30,52 +30,56 @@
 #define DEBUG 1
 //#define DEBUG 0  
 
-// Parameters for random number generation 
-#define MAX_INT 2147483647 // Max 양수 2^31 -1 
+/* Parameters for random number generation. */
+#define MAX_INT 2147483647       /* Maximum positive integer 2^31 - 1 */
 
-// Generate a random floating point # uniformly distributed in [0,1]
+/* Generate a random floating point number uniformly distributed in [0,1] */
 double Uniform01()
-{
-    double randnum; 
-    // get a random positive integer from random()
+  {
+    double randnum;
+    /* get a random positive integer from random() */
     randnum = (double) 1.0 * random();
-    // divide by max int to get something in the range 0.0 to 1.0 
+    /* divide by max int to get something in the range 0.0 to 1.0  */
     randnum = randnum / (1.0 * MAX_INT);
-    return (randnum);
-}
+    return( randnum );
+  }
 
-// Generate a random floating point # from an exponential 
-// distribution with mean mu. 
- 
-double Exponential(double mu)
-{
-    double randnum, ans; 
-    
+/* Generate a random floating point number from an exponential    */
+/* distribution with mean mu.                                     */
+double Exponential(mu)
+    double mu;
+ {
+    double randnum, ans;
+
     randnum = Uniform01();
-    ans = -(mu)*log(randnum);
-    if (DEBUG) {printf("\t !! new dur %f generated\n", ans);}
-    return ans;
-}
+    ans = -(mu) * log(randnum);
+    return( ans );
+  }
 
-void Checkperformance(double timep, int status, int bozons, double* screechy, double* mel, double* per, int* pernum, double* sil, double sttime) {
+void Checkperformance(double pretime, double timep, int status, double dur, int bozons, double* screechy, double* mel, double* per, int* pernum, double* sil, double sttime) {
+    double tmp; 
     if (bozons > 1) {
         // screechy time 
+        tmp = *screechy;
         *screechy += timep;
-        if (DEBUG) { printf("\t\tCURRENT SCREECH: %f\n", *screechy);}
+        if (DEBUG) { printf("\t\tCURRENT SCREECH:%f +%f= %f\n", tmp ,timep,*screechy);}
     } else if (bozons == 1) {
         // melodius time 
+        tmp = *mel;
         *mel += timep;
-        if (DEBUG) { printf("\t\tCURRENT MEL: %f\n", *mel);}
-        if (status == YODELING) {
+        if (DEBUG) { printf("\t\tCURRENT MEL:%f +%f= %f\n", tmp, timep, *mel);}
+        if (status == YODELING && dur == (pretime+timep)) {
             // perfect time 
+            tmp = *per;
             *per += timep;
             *pernum += 1; 
-            if (DEBUG) { printf("\t\tCURRENT PERFECT: %f\n", *per);}
+            if (DEBUG) { printf("\t\tCURRENT PERFECT:%f +%f= %f\n", tmp, timep, *per);}
         }
     } else if (bozons == 0) {
             // silent time 
+        tmp = *sil;
         *sil += timep;
-        if (DEBUG) { printf("\t\tCURRENT SILENT: %f\n", *sil);}
+        if (DEBUG) { printf("\t\tCURRENT SILENT:%f +%f= %f\n", tmp, timep, *sil);}
     } else {
         printf("ERROR: ACTIVE BOZONS count error\n");
     }
@@ -102,7 +106,7 @@ int main ()
     nexteventindex = 0;
     for(i=0;i<M;i++){
         status[i] = SLEEPING;
-        duration[i] = Exponential(S);
+        duration[i] = Exponential(S); // 왜 여기서 8.5, 7, 9가 안 나오지? 이거 TA한테 메일보내보자 
         if (DEBUG) { printf("status[%d]: duration::%f\n", i, duration[i]); } 
 
         if (duration[nexteventindex]>duration[i]) {
@@ -112,29 +116,33 @@ int main ()
     if (DEBUG) { printf("\n"); }
 
 
-    time_t starttime = mostrecentyodelstarttime= time(NULL);
-    double currdurtime = 0; 
+    // time_t starttime = mostrecentyodelstarttime= time(NULL);
+    double currdurtime = 0, prevtime = 0; 
     double timepassed = duration[nexteventindex]; 
 
     // start timer 
-    if (DEBUG) { printf("-- START LOOP: starttime: %ld\n", starttime); }
-    usleep(timepassed * 1000000);
+    if (DEBUG) { printf("-- START LOOP: starttime: 0\n"); }
+    // if (DEBUG) { printf("-- START LOOP: starttime: 0\n", starttime); }
+    // usleep(timepassed * 1000000);
 
-
+    int j = 0; 
     while(1) {
-        if (DEBUG) { printf("\tcurrent time: %ld\n", time(NULL)); }
-
+        // if (DEBUG) { printf("\tcurrent time: %ld\n", time(NULL)); }
+        if (DEBUG) {printf("\t%dth LOOP\n\n", j++);}
         currindex = nexteventindex; 
         currdurtime = duration[currindex];
 
-        Checkperformance(timepassed, status[currindex], activebozons, &screechytime, &melodiustime, &perfectyodeltime, &perfectyodels, &silenttime, mostrecentyodelstarttime);
+        if (DEBUG) { printf("\tcurrent time: %f\n", currdurtime); }
+
+        Checkperformance(prevtime, timepassed, status[currindex], currdurtime, activebozons, &screechytime, &melodiustime, &perfectyodeltime, &perfectyodels, &silenttime, mostrecentyodelstarttime);
         
         // already yodelling -> stop yodelling 
         if (status[currindex] == YODELING) {
             if (DEBUG) { printf("\tNow %dth bozon is sleeping\n", currindex);}
             status[currindex] = SLEEPING;
             duration[currindex] += Exponential(S);
-            mostrecentyodelendtime = time(NULL);
+            // mostrecentyodelendtime = time(NULL);
+            mostrecentyodelendtime = currdurtime;
             activebozons -= 1; 
         }
         // start yodelling 
@@ -144,7 +152,8 @@ int main ()
             duration[currindex] += Exponential(Y);
             yodeltries += 1; 
             mostrecentyodelertostart = currindex;   
-            mostrecentyodelstarttime = time(NULL);
+            // mostrecentyodelstarttime = time(NULL);
+            mostrecentyodelstarttime = currdurtime;
             activebozons += 1;
         }
         if (DEBUG) { printf("\t%d bozons in colony are active\n", activebozons);}
@@ -156,14 +165,14 @@ int main ()
             } 
         }
 
+        if (DEBUG) { printf("\t-- nexteventindex: %d, duration: %f\n\n", nexteventindex, duration[nexteventindex]); }
+
+        prevtime = currdurtime; 
         if (duration[nexteventindex] > END_TIME) {
-            Checkperformance(END_TIME-currdurtime, status[nexteventindex], activebozons, &screechytime, &melodiustime, &perfectyodeltime, &perfectyodels, &silenttime, mostrecentyodelstarttime);
+            Checkperformance(prevtime, END_TIME-currdurtime, status[nexteventindex], duration[nexteventindex], activebozons, &screechytime, &melodiustime, &perfectyodeltime, &perfectyodels, &silenttime, mostrecentyodelstarttime);
             break; 
         }
-
-        if (DEBUG) { printf("\t-- nexteventindex: %d, duration: %f\n\n", nexteventindex, duration[nexteventindex]); }
         timepassed = (duration[nexteventindex]-currdurtime);
-        usleep( timepassed * 1000000);
         
     }
     if (DEBUG) {printf("LOOP ENDED\n\n");}
@@ -184,8 +193,8 @@ int main ()
     if (yodeltries == 0) {
         printf("\tPerfect yodels/Attempted yodels: (nan%%)\n");
     } else {
-        printf("\tPerfect yodels/Attempted yodels: (%d%%)\n",
-            perfectyodels/yodeltries*100);
+        printf("\tPerfect yodels/Attempted yodels: %f (%f%%)\n",
+            (double)perfectyodels/(double)yodeltries, (double)perfectyodels/(double)yodeltries*100);
     }
     
     printf("\tPerfect yodel time on the channel: %f %f%%\n",
